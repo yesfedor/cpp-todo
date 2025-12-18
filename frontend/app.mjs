@@ -19,7 +19,7 @@ const options = {
 };
 
 const app = createApp(
-  await loadModule('./components/App.vue', options)
+  await loadModule('/frontend/components/App.vue', options)
 );
 
 app.mount('#app')
