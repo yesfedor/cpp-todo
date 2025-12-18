@@ -2,7 +2,9 @@ import { createApp } from 'vue'
 import { loadModule } from 'vue3-sfc-loader'
 
 const options = {
-  moduleCache: { vue: window.Vue || await import('vue') },
+  moduleCache: {
+    vue: await import('vue'),
+  },
   async getFile(url) {
     const res = await fetch(url);
     if (!res.ok) throw Object.assign(new Error(res.statusText), { res });

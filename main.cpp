@@ -1,50 +1,35 @@
 #include <crow.h>
-#include <vector>
 #include <string>
-
-struct Todo {
-    int id;
-    std::string text;
-    bool done;
-};
+#include "todo.pb.h"
 
 int main() {
     crow::SimpleApp app;
-    std::vector<Todo> todos = {
-        {1, "Купить молоко", false},
-        {2, "Настроить C++ сервер", true}
-    };
-    int next_id = 3;
 
-    // API для получения списка
+    TodoList db;
+
+    auto* t1 = db.add_items();
+    t1->set_id(1);
+    t1->set_text("Купить молоко");
+    t1->set_done(false);
+
+    auto* t2 = db.add_items();
+    t2->set_id(2);
+    t2->set_text("Настроить Protobuf");
+    t2->set_done(true);
+
+    static int next_id = 3;
+
     CROW_ROUTE(app, "/api/todos")
     ([&]() {
-        crow::json::wvalue todo_list;
-        for (size_t i = 0; i < todos.size(); i++) {
-            todo_list[i]["id"] = todos[i].id;
-            todo_list[i]["text"] = todos[i].text;
-            todo_list[i]["done"] = todos[i].done;
-        }
-        
-        crow::response res(todo_list);
-        res.add_header("Access-Control-Allow-Origin", "*"); // Разрешаем фронтенду доступ
-        return res;
-    });
+        std::string out;
+        db.SerializeToString(&out);
 
-    // API для добавления
-    CROW_ROUTE(app, "/api/todos").methods(crow::HTTPMethod::POST)
-    ([&](const crow::request& req) {
-        auto body = crow::json::load(req.body);
-        if (!body) return crow::response(400);
-
-        todos.push_back({next_id++, body["text"].s(), false});
-        
-        crow::response res(201);
+        crow::response res(out);
+        res.add_header("Content-Type", "application/x-protobuf");
         res.add_header("Access-Control-Allow-Origin", "*");
         return res;
     });
 
-    // Обработка Preflight запросов (OPTIONS) — важно для CORS при POST запросах
     CROW_ROUTE(app, "/api/todos").methods(crow::HTTPMethod::OPTIONS)
     ([]() {
         crow::response res(204);

@@ -26,8 +26,14 @@ const newTask = ref('')
 const todos = ref([])
 
 const fetchTodos = async () => {
-  const res = await fetch(API_URL)
-  todos.value = await res.json()
+const response = await fetch(API_URL);
+  const buffer = await response.arrayBuffer();
+
+  const root = await protobuf.load("/todo.proto");
+  const TodoList = root.lookupType("TodoList");
+
+  const message = TodoList.decode(new Uint8Array(buffer));
+  todos.value = TodoList.toObject(message, { arrays: true }).items;
 }
 
 const addTodo = async () => {
