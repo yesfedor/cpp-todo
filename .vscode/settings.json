@@ -1,0 +1,8 @@
+{
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "cmake.configureSettings": {
+    "CMAKE_TOOLCHAIN_FILE": "C:/dev/projects/cpp/vcpkg/scripts/buildsystems/vcpkg.cmake"
+  }
+}
